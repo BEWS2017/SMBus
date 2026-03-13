@@ -242,6 +242,21 @@ public:
 	bool hostNotify(uint8_t deviceAddress, uint8_t dataLow, uint8_t dataHigh);
 
 	/**
+	 * Schreibt "length" Bytes an den I2C-Slave.
+	 * "data" zeigt auf das erste zu sendende Byte.
+	 * Gibt true zurück, wenn die Übertragung erfolgreich war,
+	 * false sonst.
+	 */
+	bool write(uint8_t *data, uint16_t length);
+
+	/**
+	 * Liest "length" Bytes vom I2C-Slave.
+	 * "data" zeigt auf den Puffer, in den gelesen wird.
+	 * Gibt true zurück, wenn die Übertragung erfolgreich war,
+	 * false sonst.
+	 */
+	bool read(uint8_t *data, uint16_t length);
+	/**
 	 * Schreibt in das Register mit der Adresse "regAddress"
 	 * einen 16-Bit Wert (Big Endian).
 	 * Gibt true zurück, wenn die Übertragung erfolgreich war,
