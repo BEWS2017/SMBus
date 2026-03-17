@@ -100,7 +100,7 @@ float CINA226::readCurrent(){
 	int16_t signedValue = 0; //signed value;
 	float result = 0.0f;
 	if(readRegister(INA226_CURR_REG,unsignedValue)){
-		memcpy(&signedValue,&unsignedValue,sizeof(unsignedValue));
+		memcpy(&signedValue,&unsignedValue,sizeof(unsignedValue)); //copy from unsignedValue to signedValue. Looking for another way that not using memcpy
 		result = signedValue * m_currentLsb;
 	}else{
 		m_failed = true;
