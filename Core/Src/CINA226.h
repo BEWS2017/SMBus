@@ -7,6 +7,8 @@
 #ifndef CINA226_H
 #define CINA226_H
 
+#include <string.h>
+#include <stdint.h>
 #include "CI2cDevice.h"
 
 /**
