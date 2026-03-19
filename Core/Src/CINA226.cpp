@@ -23,6 +23,7 @@ CINA226::CINA226(I2C_HandleTypeDef* hi2c,
 		CI2cDevice(hi2c, deviceAddress){
 	//if(rShunt <= 0.0f || maxCurrent <= 0.0f){
 	// error warning
+	// return;
 	//}
 	m_failed = false;
 	m_currentLsb = maxCurrent / 32768.0f;
@@ -40,7 +41,7 @@ CINA226::CINA226(I2C_HandleTypeDef* hi2c,
 void CINA226::calibrate(float currentLsb, float rShunt){
 
 	//same here if currentLsb and rShunt = 0 then error warning
-	uint16_t CAL = (uint16_t)((0.00512f / (currentLsb * rShunt)) + 0.5f);
+	uint16_t CAL = static_cast<uint16_t>((0.00512f / (currentLsb * rShunt)) + 0.5f);
 	if(!writeRegister(INA226_CALI_REG,CAL)){
 		m_failed = true;
 	}
@@ -73,7 +74,7 @@ float CINA226::readBusVoltage(){
 	float result = 0.0f;
 	const float busVoltFactor = 0.00125f;
 	if(readRegister(INA226_BUS_VOLT_REG,busVoltage)){
-		result = (float)busVoltage * busVoltFactor;
+		result = static_cast<float>(busVoltage) * busVoltFactor;
 	}else{
 		m_failed = true;
 	}
@@ -87,7 +88,7 @@ float CINA226::readShuntVoltage(){
 	const float shuntVoltFactor = 0.0000025f;
 	if(readRegister(INA226_SHUNT_VOLT_REG,rawVolt)){
 		memcpy(&signedVolt,&rawVolt,sizeof(rawVolt));
-		result = signedVolt * shuntVoltFactor;
+		result = static_cast<float>(signedVolt) * shuntVoltFactor;
 	}else{
 		m_failed = true;
 	}
@@ -101,7 +102,14 @@ float CINA226::readCurrent(){
 	float result = 0.0f;
 	if(readRegister(INA226_CURR_REG,unsignedValue)){
 		memcpy(&signedValue,&unsignedValue,sizeof(unsignedValue)); //copy from unsignedValue to signedValue. Looking for another way that not using memcpy
-		result = signedValue * m_currentLsb;
+		//another way:
+		// Reinterpret two's complement bit pattern as signed.
+		// static_cast<int16_t> is implementation-defined for values > INT16_MAX,
+		// but all ARM embedded compilers (GCC, ARMCC, IAR) guarantee correct
+		// two's complement conversion. Verified: sizeof(int16_t) == sizeof(uint16_t).
+		//signedValue = static_cast<int16_t>(unsignedValue);
+
+		result = static_cast<float>(signedValue) * m_currentLsb;
 	}else{
 		m_failed = true;
 	}
@@ -114,7 +122,7 @@ float CINA226::readPower(){
 	float const powerFactor = 25.0f;
 	if(readRegister(INA226_POW_REG,value)){
 		//Page 24: Power LSB is programmed equal to 25 * current LSB
-		result = (float)value * (powerFactor * m_currentLsb);
+		result = static_cast<float>(value) * (powerFactor * m_currentLsb);
 	}else{
 		m_failed = true;
 	}

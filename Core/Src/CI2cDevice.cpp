@@ -30,9 +30,11 @@ bool CI2cDevice::quickCommand(bool readNotWrite) {
 	if (!readNotWrite) {
 		state = HAL_I2C_Master_Transmit(m_i2cController, m_slaveAddress, NULL,
 				0, I2C_TIMEOUT);
+		//state = write(*data,length); with data = NULL, lenght = NULL
 	} else {
 		state = HAL_I2C_Master_Receive(m_i2cController, m_slaveAddress, NULL, 0,
 		I2C_TIMEOUT);
+		//state = read(*data,length); same as above
 	}
 	return (state == HAL_OK);
 }
@@ -40,6 +42,8 @@ bool CI2cDevice::quickCommand(bool readNotWrite) {
 bool CI2cDevice::sendByte(uint8_t data) {
 	return HAL_I2C_Master_Transmit(m_i2cController, m_slaveAddress, &data, 1,
 	I2C_TIMEOUT);
+
+	//write(*data,length) with data = data and length = 1
 }
 
 bool CI2cDevice::writeByte(uint8_t commandCode, uint8_t data) {
